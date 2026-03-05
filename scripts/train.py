@@ -59,17 +59,39 @@ def main():
     max_len = config["data"]["max_seq_length"]
     bs = config["training"]["batch_size"]
     
+    # Auto-generate val and trim train if val doesn't exist natively
+    # This prevents FileNotFoundError during dataloading
+    val_path = config["data"]["val_path"]
+    train_path = config["data"]["train_path"]
+    
+    if not os.path.exists(val_path) and os.path.exists(train_path):
+        import pandas as pd
+        from sklearn.model_selection import train_test_split
+        logger.info(f"Validation file {val_path} not found. Creating a 90/10 split from {train_path}...")
+        
+        df = pd.read_csv(train_path)
+        train_df, val_df = train_test_split(df, test_size=0.1, random_state=42)
+        
+        # We need a local place to save these overriding the Kaggle read-only input
+        tmp_train = "temp_train.csv"
+        tmp_val = "temp_val.csv"
+        train_df.to_csv(tmp_train, index=False)
+        val_df.to_csv(tmp_val, index=False)
+        
+        train_path = tmp_train
+        val_path = tmp_val
+    
     # Phase 2 (Noisy)
-    train_ds_phase2 = AkkadianDataset(config["data"]["train_path"], tokenizer, max_len, 
+    train_ds_phase2 = AkkadianDataset(train_path, tokenizer, max_len, 
                                       augment_config=config.get("augmentation"), is_training=True)
     loader_p2 = DataLoader(train_ds_phase2, batch_size=bs, shuffle=True, collate_fn=collator, num_workers=4)
     
     # Phase 1 (Clean) - disable augmentations for curriculum phase 1
-    train_ds_phase1 = AkkadianDataset(config["data"]["train_path"], tokenizer, max_len, 
+    train_ds_phase1 = AkkadianDataset(train_path, tokenizer, max_len, 
                                       augment_config=None, is_training=True)
     loader_p1 = DataLoader(train_ds_phase1, batch_size=bs, shuffle=True, collate_fn=collator, num_workers=4)
     
-    val_ds = AkkadianDataset(config["data"]["val_path"], tokenizer, max_len, is_training=False)
+    val_ds = AkkadianDataset(val_path, tokenizer, max_len, is_training=False)
     val_loader = DataLoader(val_ds, batch_size=bs*2, shuffle=False, collate_fn=collator, num_workers=4)
     
     train_loaders = {"phase1": loader_p1, "phase2": loader_p2}
