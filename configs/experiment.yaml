@@ -29,8 +29,8 @@ training:
   epochs: 10
   warmup_steps: 1000
   gradient_accumulation_steps: 8 # Effective batch size of 32
-  mixed_precision: true # uses torch.cuda.amp
-  clip_norm: 1.0
+  mixed_precision: false # mT5 is notorious for exploding to NaN in FP16
+  clip_norm: 0.5 # Aggressive clipping to prevent loss spikes
   label_smoothing: 0.1
   save_total_limit: 1 # Only keep 1 historical checkpoint to save Kaggle 19GB Output Disk Space
 
