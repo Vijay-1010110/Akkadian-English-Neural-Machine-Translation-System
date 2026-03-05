@@ -21,8 +21,10 @@ if __name__ == "__main__":
     from data.preprocessing import normalize_akkadian, preprocess_english
     
     df = pd.read_csv(args.data_csv)
-    akk_col = df.columns[0] if 'akkadian' not in df.columns else 'akkadian'
-    eng_col = df.columns[1] if 'english' not in df.columns else 'english'
+    akk_candidates = ['transliteration', 'akkadian', 'source', 'text']
+    eng_candidates = ['translation', 'english', 'target']
+    akk_col = next((c for c in akk_candidates if c in df.columns), df.columns[0])
+    eng_col = next((c for c in eng_candidates if c in df.columns), df.columns[1] if len(df.columns) > 1 else df.columns[0])
     df = df.dropna(subset=[akk_col, eng_col])
     
     temp_txt = "temp_corpus.txt"

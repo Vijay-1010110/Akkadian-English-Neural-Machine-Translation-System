@@ -17,8 +17,10 @@ class AkkadianDataset(Dataset):
         self.df = pd.read_csv(data_path)
         
         # Determine column names dynamically if standard ones aren't found
-        self.akk_col = 'akkadian' if 'akkadian' in self.df.columns else self.df.columns[0]
-        self.eng_col = 'english' if 'english' in self.df.columns else self.df.columns[1]
+        akk_candidates = ['transliteration', 'akkadian', 'source', 'text']
+        eng_candidates = ['translation', 'english', 'target']
+        self.akk_col = next((c for c in akk_candidates if c in self.df.columns), self.df.columns[0])
+        self.eng_col = next((c for c in eng_candidates if c in self.df.columns), self.df.columns[1] if len(self.df.columns) > 1 else self.df.columns[0])
         
         # Clean data inline
         original_len = len(self.df)

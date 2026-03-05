@@ -61,8 +61,9 @@ def main():
     df = pd.read_csv(test_path)
     
     # Kaggle expects output format: id, translation
-    id_col = df.columns[0]
-    akk_col = df.columns[1] if len(df.columns) > 1 else df.columns[0]
+    id_col = 'id' if 'id' in df.columns else df.columns[0]
+    akk_candidates = ['transliteration', 'akkadian', 'source', 'text']
+    akk_col = next((c for c in akk_candidates if c in df.columns), df.columns[1] if len(df.columns) > 1 else df.columns[0])
     
     predictions = []
     batch_size = config["training"].get("batch_size", 8) * 2
