@@ -81,10 +81,11 @@ class Seq2SeqTransformer(nn.Module):
         logits = self.out(out)
         return logits
 
-    def encode(self, input_ids):
+    def encode(self, input_ids, src_key_padding_mask=None):
         src = self.embedding(input_ids) * math.sqrt(self.transformer.d_model)
         src = self.pos_encoder(src)
-        src_key_padding_mask = (input_ids == self.pad_id)
+        if src_key_padding_mask is None:
+            src_key_padding_mask = (input_ids == self.pad_id)
         memory = self.transformer.encoder(src, src_key_padding_mask=src_key_padding_mask)
         return memory, src_key_padding_mask
 

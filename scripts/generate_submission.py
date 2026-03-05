@@ -56,8 +56,9 @@ def main():
     
     decoder = DecoderEngine(model, config, tokenizer, device)
     
-    logger.info(f"Reading test data from {args.test_data}")
-    df = pd.read_csv(args.test_data)
+    test_path = args.test_data if args.test_data != "data/raw/test.csv" else config["data"].get("test_path", args.test_data)
+    logger.info(f"Reading test data from {test_path}")
+    df = pd.read_csv(test_path)
     
     # Kaggle expects output format: id, translation
     id_col = df.columns[0]
