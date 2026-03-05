@@ -20,7 +20,7 @@ data:
   train_path: "/kaggle/input/competitions/deep-past-initiative-machine-translation/train.csv"
   val_path: "/kaggle/input/competitions/deep-past-initiative-machine-translation/val.csv"
   test_path: "/kaggle/input/competitions/deep-past-initiative-machine-translation/test.csv"
-  max_seq_length: 128
+  max_seq_length: 64 # Halved from 128: Cuts self-attention memory by 4x for mT5-base
 
 training:
   batch_size: 2 # Reduced to 2 to prevent CUDA Out of Memory on T4 with mT5-base
