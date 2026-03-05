@@ -1,8 +1,8 @@
 experiment_name: "akkadian_custom_transformer_v1"
 
 model:
-  type: "custom" # options: "custom", "mbart", "mt5"
-  pretrained_path: "facebook/mbart-large-50" # used if type != custom
+  type: "mt5" # options: "custom", "mbart", "mt5"
+  pretrained_path: "google/mt5-base" # used if type != custom
   custom_config:
     encoder_layers: 6
     decoder_layers: 6
@@ -23,12 +23,12 @@ data:
   max_seq_length: 128
 
 training:
-  batch_size: 32 # Increased to saturate VRAM (was 4)
-  learning_rate: 5.0e-4 # Crucial: Increased from 3e-5 as models trained from scratch require higher LRs than fine-tuning
-  weight_decay: 0.0001
-  epochs: 15
+  batch_size: 8 # Decreased to fit mT5-base on Kaggle T4
+  learning_rate: 3.0e-5 # Crucial: Decreased for fine-tuning
+  weight_decay: 0.01
+  epochs: 10
   warmup_steps: 1000
-  gradient_accumulation_steps: 1 # Decreased since batch is high enough
+  gradient_accumulation_steps: 4 # Increased to compensate for small batch size
   mixed_precision: true # uses torch.cuda.amp
   clip_norm: 1.0
   label_smoothing: 0.1
@@ -47,8 +47,7 @@ augmentation:
 generation:
   beam_size: 5
   max_output_length: 64
-  length_penalty: 1.0
-  repetition_penalty: 1.2
+  length_penalty: 0.6
   early_stopping: true
 
 paths:
