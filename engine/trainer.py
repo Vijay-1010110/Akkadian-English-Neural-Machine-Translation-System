@@ -70,11 +70,7 @@ class Trainer:
             state_dict["optimizer_state_dict"] = self.optimizer.state_dict()
             state_dict["scheduler_state_dict"] = self.scheduler.state_dict()
             state_dict["scaler_state_dict"] = self.scaler.state_dict() if self.mixed_precision else None
-            
-            "epoch": self.current_epoch,
-            "step": self.global_step,
-            "best_val_loss": self.best_val_loss
-        }
+
         self.ckpt_engine.save(is_best, state_dict, self.current_epoch, self.global_step)
         
     def _get_current_loader(self):
