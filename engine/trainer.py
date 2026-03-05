@@ -61,9 +61,16 @@ class Trainer:
             
         state_dict = {
             "model_state_dict": self.model.state_dict(),
-            "optimizer_state_dict": self.optimizer.state_dict(),
-            "scheduler_state_dict": self.scheduler.state_dict(),
-            "scaler_state_dict": self.scaler.state_dict() if self.mixed_precision else None,
+            "epoch": self.current_epoch,
+            "step": self.global_step,
+            "best_val_loss": self.best_val_loss
+        }
+        
+        if self.config["training"].get("save_optimizer_state", False):
+            state_dict["optimizer_state_dict"] = self.optimizer.state_dict()
+            state_dict["scheduler_state_dict"] = self.scheduler.state_dict()
+            state_dict["scaler_state_dict"] = self.scaler.state_dict() if self.mixed_precision else None
+            
             "epoch": self.current_epoch,
             "step": self.global_step,
             "best_val_loss": self.best_val_loss
