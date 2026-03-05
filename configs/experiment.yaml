@@ -23,12 +23,12 @@ data:
   max_seq_length: 128
 
 training:
-  batch_size: 4
+  batch_size: 32 # Increased to saturate VRAM (was 4)
   learning_rate: 3.0e-5
   weight_decay: 0.01
-  epochs: 10
+  epochs: 15
   warmup_steps: 1000
-  gradient_accumulation_steps: 4
+  gradient_accumulation_steps: 1 # Decreased since batch is high enough
   mixed_precision: true # uses torch.cuda.amp
   clip_norm: 1.0
   label_smoothing: 0.1
