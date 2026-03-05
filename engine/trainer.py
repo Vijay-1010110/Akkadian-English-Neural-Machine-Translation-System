@@ -45,8 +45,10 @@ class Trainer:
             model_state = {"module."+k: v for k, v in model_state.items()}
             
         self.model.load_state_dict(model_state, strict=False)
-        self.optimizer.load_state_dict(state_dict["optimizer_state_dict"])
-        self.scheduler.load_state_dict(state_dict["scheduler_state_dict"])
+        if "optimizer_state_dict" in state_dict:
+            self.optimizer.load_state_dict(state_dict["optimizer_state_dict"])
+        if "scheduler_state_dict" in state_dict:
+            self.scheduler.load_state_dict(state_dict["scheduler_state_dict"])
         if "scaler_state_dict" in state_dict and self.mixed_precision:
             self.scaler.load_state_dict(state_dict["scaler_state_dict"])
             
