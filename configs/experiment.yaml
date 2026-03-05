@@ -13,7 +13,7 @@ model:
 
 tokenizer:
   model_path: "tokenizer/tokenizer.model"
-  vocab_size: 12000
+  vocab_size: 2000
   special_tokens: ["<DIVINE>", "<MISSING>", "<LOGOGRAM>"]
 
 data:
