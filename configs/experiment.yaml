@@ -2,7 +2,7 @@ experiment_name: "akkadian_custom_transformer_v1"
 
 model:
   type: "mt5" # options: "custom", "mbart", "mt5"
-  pretrained_path: "google/mt5-base" # used if type != custom
+  pretrained_path: "google/mt5-small" # Switched to small to guarantee it fits in 15GB VRAM
   custom_config:
     encoder_layers: 6
     decoder_layers: 6
@@ -23,12 +23,12 @@ data:
   max_seq_length: 64 # Halved from 128: Cuts self-attention memory by 4x for mT5-base
 
 training:
-  batch_size: 2 # Reduced to 2 to prevent CUDA Out of Memory on T4 with mT5-base
+  batch_size: 4 # Safe batch size for mt5-small
   learning_rate: 3.0e-5 # Crucial: Decreased for fine-tuning
   weight_decay: 0.01
   epochs: 10
   warmup_steps: 1000
-  gradient_accumulation_steps: 16 # Increased to 16 to maintain effective batch size of 32
+  gradient_accumulation_steps: 8 # Effective batch size of 32
   mixed_precision: true # uses torch.cuda.amp
   clip_norm: 1.0
   label_smoothing: 0.1
