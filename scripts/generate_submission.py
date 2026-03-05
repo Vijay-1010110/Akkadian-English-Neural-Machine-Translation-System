@@ -10,7 +10,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from utils.config_loader import load_config
 from utils.device import get_device
-from logging.logger import get_logger
+from custom_logging.logger import get_logger
 from data.tokenizer_utils import load_tokenizer
 from data.preprocessing import normalize_akkadian
 from models.model_registry import ModelRegistry

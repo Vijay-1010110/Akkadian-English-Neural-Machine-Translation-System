@@ -3,13 +3,14 @@ import os
 import sys
 from torch.utils.data import DataLoader
 
+# Add the project root (akkadian_research) to sys.path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from utils.config_loader import load_config
 from utils.seed import set_seed
 from utils.device import get_device
-from logging.logger import get_logger
-from logging.tensorboard_logger import TensorBoardLogger
+from custom_logging.logger import get_logger
+from custom_logging.tensorboard_logger import TensorBoardLogger
 
 from data.tokenizer_utils import load_tokenizer
 from data.dataset import AkkadianDataset
