@@ -120,6 +120,9 @@ class Trainer:
                         tgt_attention_mask=tgt_mask
                     )
                     
+                if loss.dim() > 0:
+                    loss = loss.mean()
+                    
                 loss = loss / self.grad_accum_steps
                 
             self.scaler.scale(loss).backward()
@@ -174,6 +177,9 @@ class Trainer:
                         tgt_attention_mask=tgt_mask
                     )
                 
+                if loss.dim() > 0:
+                    loss = loss.mean()
+                    
             total_loss += loss.item()
             pbar.set_postfix({"loss": f"{loss.item():.4f}"})
             
