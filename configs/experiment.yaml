@@ -32,6 +32,7 @@ training:
   mixed_precision: true # uses torch.cuda.amp
   clip_norm: 1.0
   label_smoothing: 0.1
+  save_total_limit: 1 # Only keep 1 historical checkpoint to save Kaggle 19GB Output Disk Space
 
 curriculum:
   enabled: true
