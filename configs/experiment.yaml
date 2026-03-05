@@ -23,12 +23,12 @@ data:
   max_seq_length: 64 # Halved from 128: Cuts self-attention memory by 4x for mT5-base
 
 training:
-  batch_size: 4 # Safe batch size for mt5-small
+  batch_size: 2 # Reduced to 2: mT5-small in FP32 takes exactly 2x memory of FP16
   learning_rate: 3.0e-5 # Crucial: Decreased for fine-tuning
   weight_decay: 0.01
   epochs: 10
   warmup_steps: 1000
-  gradient_accumulation_steps: 8 # Effective batch size of 32
+  gradient_accumulation_steps: 16 # Effective batch size of 32
   mixed_precision: false # mT5 is notorious for exploding to NaN in FP16
   clip_norm: 0.5 # Aggressive clipping to prevent loss spikes
   label_smoothing: 0.1
