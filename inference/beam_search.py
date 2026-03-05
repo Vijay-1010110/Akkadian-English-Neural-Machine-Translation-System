@@ -3,7 +3,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def beam_search_decode(model, src, src_mask, max_len, start_symbol, end_symbol, pad_symbol, beam_size=5, length_penalty=1.0):
+def beam_search_decode(model, src, src_mask, max_len, start_symbol, end_symbol, pad_symbol, beam_size=5, length_penalty=1.0, repetition_penalty=1.2):
     """
     Implements standard Beam Search for custom models lacking `.generate()`.
     Adapted for Transformer architecture.
@@ -37,6 +37,18 @@ def beam_search_decode(model, src, src_mask, max_len, start_symbol, end_symbol, 
         
         # Get log probs of the *last* predicted token
         next_token_logits = logits[:, -1, :] # [batch * current_beam, vocab]
+        
+        # Apply repetition penalty
+        if repetition_penalty != 1.0:
+            for i in range(next_token_logits.size(0)):
+                # Penalty logic: if score < 0, multiply by penalty. If > 0, divide.
+                # Find which tokens have already been generated in this beam
+                for token_id in set(flat_seqs[i].tolist()):
+                    if next_token_logits[i, token_id] < 0:
+                        next_token_logits[i, token_id] *= repetition_penalty
+                    else:
+                        next_token_logits[i, token_id] /= repetition_penalty
+                        
         next_token_logprobs = torch.log_softmax(next_token_logits, dim=-1)
         
         # Expand step

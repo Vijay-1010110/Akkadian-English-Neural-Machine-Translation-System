@@ -16,6 +16,7 @@ class DecoderEngine:
         self.beam_size = config["generation"].get("beam_size", 5)
         self.max_len = config["generation"].get("max_output_length", 64)
         self.length_penalty = config["generation"].get("length_penalty", 1.0)
+        self.repetition_penalty = config["generation"].get("repetition_penalty", 1.2)
         
         # Depending on Tokenizer type (Sentencepiece vs HF), get special tokens
         if hasattr(self.tokenizer, "bos_token_id"):
@@ -45,7 +46,8 @@ class DecoderEngine:
                 max_length=self.max_len,
                 num_beams=self.beam_size,
                 early_stopping=self.config["generation"].get("early_stopping", True),
-                length_penalty=self.length_penalty
+                length_penalty=self.length_penalty,
+                repetition_penalty=self.repetition_penalty
             )
             # HF generate returns padded tensor batch, convert to explicit list of lists
             return [out.cpu().tolist() for out in outputs]
@@ -63,7 +65,8 @@ class DecoderEngine:
                 end_symbol=self.eos_id,
                 pad_symbol=self.pad_id,
                 beam_size=self.beam_size,
-                length_penalty=self.length_penalty
+                length_penalty=self.length_penalty,
+                repetition_penalty=self.repetition_penalty
             )
             return [seq.cpu().tolist() for seq in output_seqs]
             

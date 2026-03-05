@@ -24,8 +24,8 @@ data:
 
 training:
   batch_size: 32 # Increased to saturate VRAM (was 4)
-  learning_rate: 3.0e-5
-  weight_decay: 0.01
+  learning_rate: 5.0e-4 # Crucial: Increased from 3e-5 as models trained from scratch require higher LRs than fine-tuning
+  weight_decay: 0.0001
   epochs: 15
   warmup_steps: 1000
   gradient_accumulation_steps: 1 # Decreased since batch is high enough
@@ -48,6 +48,7 @@ generation:
   beam_size: 5
   max_output_length: 64
   length_penalty: 1.0
+  repetition_penalty: 1.2
   early_stopping: true
 
 paths:
