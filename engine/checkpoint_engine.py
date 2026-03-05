@@ -17,22 +17,19 @@ class CheckpointEngine:
         os.makedirs(self.checkpoint_dir, exist_ok=True)
         
     def save(self, is_best, state_dict, epoch, step):
-        filename = f"checkpoint_epoch{epoch}_step{step}.pt"
-        filepath = os.path.join(self.checkpoint_dir, filename)
-        
-        torch.save(state_dict, filepath)
-        
+        # Always just overwrite 'latest_checkpoint.pt' directly to save Kaggle disk space
         latest_path = os.path.join(self.checkpoint_dir, "latest_checkpoint.pt")
-        shutil.copyfile(filepath, latest_path)
+        torch.save(state_dict, latest_path)
         
         if is_best:
             best_path = os.path.join(self.checkpoint_dir, "best_checkpoint.pt")
-            shutil.copyfile(filepath, best_path)
+            shutil.copyfile(latest_path, best_path)
             
-        self._cleanup_old_checkpoints()
-        logger.info(f"Saved checkpoint: {filename} (Best: {is_best})")
+        logger.info(f"Saved checkpoint (Best: {is_best})")
         
     def _cleanup_old_checkpoints(self):
+        # We don't save epoch-specific checkpoints anymore, so nothing to clean up
+        pass
         all_checkpoints = glob.glob(os.path.join(self.checkpoint_dir, "checkpoint_epoch*_step*.pt"))
         all_checkpoints.sort(key=os.path.getmtime)
         
