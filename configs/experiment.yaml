@@ -21,6 +21,7 @@ data:
   val_path: "/kaggle/input/competitions/deep-past-initiative-machine-translation/val.csv"
   test_path: "/kaggle/input/competitions/deep-past-initiative-machine-translation/test.csv"
   max_seq_length: 64 # Halved from 128: Cuts self-attention memory by 4x for mT5-base
+  task_prefix: "translate Akkadian to English: " # Critical for T5/mT5 models to know the task
 
 training:
   batch_size: 2 # Reduced to 2: mT5-small in FP32 takes exactly 2x memory of FP16

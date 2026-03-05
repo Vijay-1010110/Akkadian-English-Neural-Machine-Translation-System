@@ -80,7 +80,10 @@ def main():
                 input_tensor = torch.tensor(padded_src, dtype=torch.long)
                 output_tokens = decoder.generate_batch(input_tensor, attention_mask=None)
             else:
-                inputs = tokenizer(raw_sources, return_tensors="pt", padding=True, truncation=True, max_length=config["data"]["max_seq_length"])
+                # Prepend task prefix for T5/mT5 models
+                task_prefix = config["data"].get("task_prefix", "")
+                prefixed_sources = [task_prefix + s for s in raw_sources]
+                inputs = tokenizer(prefixed_sources, return_tensors="pt", padding=True, truncation=True, max_length=config["data"]["max_seq_length"])
                 output_tokens = decoder.generate_batch(inputs["input_ids"], attention_mask=inputs["attention_mask"])
                 
             decoded_preds = decoder.decode_tokens(output_tokens)

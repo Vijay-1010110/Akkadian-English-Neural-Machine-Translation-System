@@ -81,17 +81,20 @@ def main():
         train_path = tmp_train
         val_path = tmp_val
     
+    # Task prefix for T5/mT5 models (tells the model what task to perform)
+    task_prefix = config["data"].get("task_prefix", "")
+    
     # Phase 2 (Noisy)
     train_ds_phase2 = AkkadianDataset(train_path, tokenizer, max_len, 
-                                      augment_config=config.get("augmentation"), is_training=True)
+                                      augment_config=config.get("augmentation"), is_training=True, task_prefix=task_prefix)
     loader_p2 = DataLoader(train_ds_phase2, batch_size=bs, shuffle=True, collate_fn=collator, num_workers=4)
     
     # Phase 1 (Clean) - disable augmentations for curriculum phase 1
     train_ds_phase1 = AkkadianDataset(train_path, tokenizer, max_len, 
-                                      augment_config=None, is_training=True)
+                                      augment_config=None, is_training=True, task_prefix=task_prefix)
     loader_p1 = DataLoader(train_ds_phase1, batch_size=bs, shuffle=True, collate_fn=collator, num_workers=4)
     
-    val_ds = AkkadianDataset(val_path, tokenizer, max_len, is_training=False)
+    val_ds = AkkadianDataset(val_path, tokenizer, max_len, is_training=False, task_prefix=task_prefix)
     val_loader = DataLoader(val_ds, batch_size=bs*2, shuffle=False, collate_fn=collator, num_workers=4)
     
     train_loaders = {"phase1": loader_p1, "phase2": loader_p2}

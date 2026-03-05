@@ -13,7 +13,7 @@ class AkkadianDataset(Dataset):
     PyTorch Dataset for loading Akkadian-English pairs.
     Supports on-the-fly augmentation and tokenization.
     """
-    def __init__(self, data_path, tokenizer, max_seq_length, augment_config=None, is_training=False):
+    def __init__(self, data_path, tokenizer, max_seq_length, augment_config=None, is_training=False, task_prefix=""):
         self.df = pd.read_csv(data_path)
         
         # Determine column names dynamically if standard ones aren't found
@@ -35,6 +35,7 @@ class AkkadianDataset(Dataset):
         self.tokenizer = tokenizer
         self.max_seq_len = max_seq_length
         self.is_training = is_training
+        self.task_prefix = task_prefix  # e.g. "translate Akkadian to English: "
         
         self.augmenter = None
         if self.is_training and augment_config:
@@ -58,8 +59,9 @@ class AkkadianDataset(Dataset):
             
         # Ensure HF tokenizer compatibility vs custom SPM tokenizer
         if hasattr(self.tokenizer, "encode_plus"):
-            # HuggingFace PreTrainedTokenizer
-            src_enc = self.tokenizer(akk_text, truncation=True, max_length=self.max_seq_len)
+            # HuggingFace PreTrainedTokenizer - prepend task prefix for T5/mT5
+            src_text = self.task_prefix + akk_text
+            src_enc = self.tokenizer(src_text, truncation=True, max_length=self.max_seq_len)
             tgt_enc = self.tokenizer(eng_text, truncation=True, max_length=self.max_seq_len)
             return {
                 "source_ids": src_enc["input_ids"],
