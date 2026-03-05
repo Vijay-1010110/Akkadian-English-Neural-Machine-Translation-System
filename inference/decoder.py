@@ -74,7 +74,15 @@ class DecoderEngine:
         sentences = []
         for tokens in token_lists:
             if hasattr(self.tokenizer, "decode"):
-                # Either HF or Sentencepiece native decode handles lists
-                decoded = self.tokenizer.decode(tokens, skip_special_tokens=True)
+                # Handle SentencePieceProcessor vs HuggingFace Tokenizer differences
+                import sentencepiece as spm
+                if isinstance(self.tokenizer, spm.SentencePieceProcessor):
+                    # SentencePiece handles special tokens via DecodeIds natively
+                    # It expects a list of ints. (remove padding/eos manually if desired, but Decode handles it usually)
+                    clean_tokens = [t for t in tokens if t not in [self.pad_id, self.eos_id, self.bos_id]]
+                    decoded = self.tokenizer.decode(clean_tokens)
+                else:
+                    # HuggingFace PreTrainedTokenizer
+                    decoded = self.tokenizer.decode(tokens, skip_special_tokens=True)
                 sentences.append(decoded)
         return sentences
