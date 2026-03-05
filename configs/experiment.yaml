@@ -23,12 +23,12 @@ data:
   max_seq_length: 128
 
 training:
-  batch_size: 8 # Decreased to fit mT5-base on Kaggle T4
+  batch_size: 2 # Reduced to 2 to prevent CUDA Out of Memory on T4 with mT5-base
   learning_rate: 3.0e-5 # Crucial: Decreased for fine-tuning
   weight_decay: 0.01
   epochs: 10
   warmup_steps: 1000
-  gradient_accumulation_steps: 4 # Increased to compensate for small batch size
+  gradient_accumulation_steps: 16 # Increased to 16 to maintain effective batch size of 32
   mixed_precision: true # uses torch.cuda.amp
   clip_norm: 1.0
   label_smoothing: 0.1
