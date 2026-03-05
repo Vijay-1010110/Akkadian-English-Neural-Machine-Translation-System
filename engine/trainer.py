@@ -109,7 +109,7 @@ class Trainer:
                     loss = self.criterion(output.reshape(-1, output.size(-1)), tgt_expected.reshape(-1))
                 else:
                     # Let HF AutoModelForSeq2SeqLM compute the loss natively to perfectly handle decoder input shifting
-                    pad_id = self.model.model.config.pad_token_id
+                    pad_id = self.model.module.model.config.pad_token_id if hasattr(self.model, "module") else self.model.model.config.pad_token_id
                     labels = batch["target_ids"].clone().to(self.device)
                     labels[labels == pad_id] = -100
                     
@@ -163,7 +163,7 @@ class Trainer:
                     loss = self.criterion(output.reshape(-1, output.size(-1)), tgt_expected.reshape(-1))
                 else:
                     # Let HF AutoModelForSeq2SeqLM compute the loss natively to perfectly handle decoder input shifting
-                    pad_id = self.model.model.config.pad_token_id
+                    pad_id = self.model.module.model.config.pad_token_id if hasattr(self.model, "module") else self.model.model.config.pad_token_id
                     labels = batch["target_ids"].clone().to(self.device)
                     labels[labels == pad_id] = -100
                     
