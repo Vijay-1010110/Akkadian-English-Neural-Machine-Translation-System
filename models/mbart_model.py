@@ -22,17 +22,23 @@ class PretrainedSeq2SeqWrapper(nn.Module):
             logger.info("Resizing token embeddings to fit new tokenizer vocabulary.")
             self.model.resize_token_embeddings(len(tokenizer))
 
-    def forward(self, input_ids, decoder_input_ids, src_attention_mask=None, tgt_attention_mask=None):
-        # HuggingFace models typically handle the causal masking internally
-        # We just need to pass the correctly shifted labels or decoder_input_ids
-        outputs = self.model(
-            input_ids=input_ids,
-            attention_mask=src_attention_mask,
-            decoder_input_ids=decoder_input_ids,
-            decoder_attention_mask=tgt_attention_mask
-        )
-        # return logits: [batch, seq_len, vocab_size]
-        return outputs.logits
+    def forward(self, input_ids, decoder_input_ids=None, labels=None, src_attention_mask=None, tgt_attention_mask=None):
+        if labels is not None:
+            outputs = self.model(
+                input_ids=input_ids,
+                attention_mask=src_attention_mask,
+                labels=labels
+            )
+            # When labels are provided, HF auto-shifts them to create proper decoder_input_ids (like `<pad>`)
+            return outputs.logits, outputs.loss
+        else:
+            outputs = self.model(
+                input_ids=input_ids,
+                attention_mask=src_attention_mask,
+                decoder_input_ids=decoder_input_ids,
+                decoder_attention_mask=tgt_attention_mask
+            )
+            return outputs.logits
 
     def encode(self, input_ids, src_attention_mask=None):
         # Using HF encode hooks

@@ -106,10 +106,20 @@ class Trainer:
             with torch.cuda.amp.autocast(enabled=self.mixed_precision):
                 if self.config["model"]["type"] == "custom":
                     output = self.model(src, tgt_input)
+                    loss = self.criterion(output.reshape(-1, output.size(-1)), tgt_expected.reshape(-1))
                 else:
-                    output = self.model(src, tgt_input, src_attention_mask=src_mask, tgt_attention_mask=tgt_mask)
+                    # Let HF AutoModelForSeq2SeqLM compute the loss natively to perfectly handle decoder input shifting
+                    pad_id = self.model.model.config.pad_token_id
+                    labels = batch["target_ids"].clone().to(self.device)
+                    labels[labels == pad_id] = -100
                     
-                loss = self.criterion(output.reshape(-1, output.size(-1)), tgt_expected.reshape(-1))
+                    logits, loss = self.model(
+                        input_ids=src,
+                        labels=labels,
+                        src_attention_mask=src_mask,
+                        tgt_attention_mask=tgt_mask
+                    )
+                    
                 loss = loss / self.grad_accum_steps
                 
             self.scaler.scale(loss).backward()
@@ -150,10 +160,19 @@ class Trainer:
             with torch.cuda.amp.autocast(enabled=self.mixed_precision):
                 if self.config["model"]["type"] == "custom":
                     output = self.model(src, tgt_input)
+                    loss = self.criterion(output.reshape(-1, output.size(-1)), tgt_expected.reshape(-1))
                 else:
-                    output = self.model(src, tgt_input, src_attention_mask=src_mask, tgt_attention_mask=tgt_mask)
+                    # Let HF AutoModelForSeq2SeqLM compute the loss natively to perfectly handle decoder input shifting
+                    pad_id = self.model.model.config.pad_token_id
+                    labels = batch["target_ids"].clone().to(self.device)
+                    labels[labels == pad_id] = -100
                     
-                loss = self.criterion(output.reshape(-1, output.size(-1)), tgt_expected.reshape(-1))
+                    logits, loss = self.model(
+                        input_ids=src,
+                        labels=labels,
+                        src_attention_mask=src_mask,
+                        tgt_attention_mask=tgt_mask
+                    )
                 
             total_loss += loss.item()
             pbar.set_postfix({"loss": f"{loss.item():.4f}"})
