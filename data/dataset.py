@@ -67,16 +67,20 @@ class AkkadianDataset(Dataset):
             }
         else:
             # Custom SentencePiece
-            bos_id = self.tokenizer.bos_id()
-            eos_id = self.tokenizer.eos_id()
+            bos_id = getattr(self.tokenizer, "bos_id", lambda: None)()
+            eos_id = getattr(self.tokenizer, "eos_id", lambda: None)()
             
-            source_ids = [bos_id] + self.tokenizer.encode(akk_text) + [eos_id]
-            target_ids = [bos_id] + self.tokenizer.encode(eng_text) + [eos_id]
+            # encode output
+            encoded_akk = self.tokenizer.encode(akk_text)
+            encoded_eng = self.tokenizer.encode(eng_text)
+            
+            source_ids = ([bos_id] if bos_id is not None else []) + encoded_akk + ([eos_id] if eos_id is not None else [])
+            target_ids = ([bos_id] if bos_id is not None else []) + encoded_eng + ([eos_id] if eos_id is not None else [])
             
             if len(source_ids) > self.max_seq_len:
-                source_ids = source_ids[:self.max_seq_len-1] + [eos_id]
+                source_ids = source_ids[:self.max_seq_len-1] + ([eos_id] if eos_id is not None else [])
             if len(target_ids) > self.max_seq_len:
-                target_ids = target_ids[:self.max_seq_len-1] + [eos_id]
+                target_ids = target_ids[:self.max_seq_len-1] + ([eos_id] if eos_id is not None else [])
                 
             return {
                 "source_ids": source_ids,

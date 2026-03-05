@@ -19,14 +19,14 @@ class DecoderEngine:
         self.repetition_penalty = config["generation"].get("repetition_penalty", 1.2)
         
         # Depending on Tokenizer type (Sentencepiece vs HF), get special tokens
-        if hasattr(self.tokenizer, "bos_token_id"):
-            self.bos_id = self.tokenizer.bos_token_id
-            self.eos_id = self.tokenizer.eos_token_id
-            self.pad_id = self.tokenizer.pad_token_id
+        if hasattr(self.tokenizer, "bos_token_id") or hasattr(self.tokenizer, "pad_token_id"):
+            self.bos_id = getattr(self.tokenizer, "bos_token_id", None)
+            self.eos_id = getattr(self.tokenizer, "eos_token_id", None)
+            self.pad_id = getattr(self.tokenizer, "pad_token_id", None)
         else:
-            self.bos_id = self.tokenizer.bos_id()
-            self.eos_id = self.tokenizer.eos_id()
-            self.pad_id = self.tokenizer.pad_id()
+            self.bos_id = getattr(self.tokenizer, "bos_id", lambda: None)()
+            self.eos_id = getattr(self.tokenizer, "eos_id", lambda: None)()
+            self.pad_id = getattr(self.tokenizer, "pad_id", lambda: None)()
             
     @torch.no_grad()
     def generate_batch(self, input_ids, attention_mask=None):
