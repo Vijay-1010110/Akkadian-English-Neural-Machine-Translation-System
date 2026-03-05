@@ -97,13 +97,13 @@ def beam_search_decode(model, src, src_mask, max_len, start_symbol, end_symbol, 
                     b_new_seqs.append(new_seq)
                     b_new_scores.append(score)
             
-            # If we don't have enough running beams to continue (all finished), pad it out or stop
-            if not b_new_seqs:
-                # Add a dummy pad so shapes match
-                b_new_seqs = [torch.full((current_seq_len + 1,), pad_symbol, dtype=torch.long, device=device)]
-                b_new_scores = [torch.tensor(float('-inf'), device=device)]
+            # If we don't have enough running beams to continue (due to some finishing), pad it out
+            while len(b_new_seqs) < beam_size:
+                # Add a dummy pad so shapes perfectly match [beam_size, seq_len]
+                b_new_seqs.append(torch.full((current_seq_len + 1,), pad_symbol, dtype=torch.long, device=device))
+                b_new_scores.append(torch.tensor(float('-inf'), device=device))
                 
-            # Keep only up to beam_size running sequences
+            # Keep only exactly beam_size running sequences
             new_running_seqs.append(torch.stack(b_new_seqs[:beam_size]))
             new_running_scores.append(torch.stack(b_new_scores[:beam_size]))
             
