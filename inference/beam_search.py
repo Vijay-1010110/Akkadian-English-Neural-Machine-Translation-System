@@ -18,8 +18,8 @@ def beam_search_decode(model, src, src_mask, max_len, start_symbol, end_symbol, 
     # We maintain a list of completed hypotheses per batch item
     completed_hyps = [[] for _ in range(batch_size)]
     
-    # Starting tokens: [batch_size, 1]
-    running_seqs = torch.full((batch_size, 1), start_symbol, dtype=torch.long, device=device)
+    # Starting tokens: [batch_size, 1, 1]
+    running_seqs = torch.full((batch_size, 1, 1), start_symbol, dtype=torch.long, device=device)
     running_scores = torch.zeros((batch_size, 1), dtype=torch.float, device=device)
     
     # We iteratively expand building the beam

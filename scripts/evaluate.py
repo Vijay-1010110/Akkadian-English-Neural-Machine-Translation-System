@@ -69,8 +69,8 @@ def main():
     eval_path = args.eval_data if args.eval_data != "data/raw/val.csv" else config["data"].get("val_path", args.eval_data)
     
     # If using auto-split from training
-    if not os.path.exists(eval_path) and os.path.exists("/kaggle/working/temp_val.csv"):
-        eval_path = "/kaggle/working/temp_val.csv"
+    if not os.path.exists(eval_path) and os.path.exists("temp_val.csv"):
+        eval_path = "temp_val.csv"
         
     df = pd.read_csv(eval_path)
     akk_col = df.columns[0] if 'akkadian' not in df.columns else 'akkadian'
