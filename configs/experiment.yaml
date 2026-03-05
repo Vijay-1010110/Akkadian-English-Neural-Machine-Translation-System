@@ -1,0 +1,55 @@
+experiment_name: "akkadian_custom_transformer_v1"
+
+model:
+  type: "custom" # options: "custom", "mbart", "mt5"
+  pretrained_path: "facebook/mbart-large-50" # used if type != custom
+  custom_config:
+    encoder_layers: 6
+    decoder_layers: 6
+    hidden_size: 512
+    attention_heads: 8
+    feedforward_dim: 2048
+    dropout: 0.1
+
+tokenizer:
+  model_path: "tokenizer/tokenizer.model"
+  vocab_size: 12000
+  special_tokens: ["<DIVINE>", "<MISSING>", "<LOGOGRAM>"]
+
+data:
+  train_path: "data/raw/train.csv"
+  val_path: "data/raw/val.csv"
+  test_path: "data/raw/test.csv"
+  max_seq_length: 128
+
+training:
+  batch_size: 4
+  learning_rate: 3.0e-5
+  weight_decay: 0.01
+  epochs: 10
+  warmup_steps: 1000
+  gradient_accumulation_steps: 4
+  mixed_precision: true # uses torch.cuda.amp
+  clip_norm: 1.0
+  label_smoothing: 0.1
+
+curriculum:
+  enabled: true
+  phase1_epochs: 3 # Clean data only
+  phase2_epochs: 7 # Mix with noisy data
+
+augmentation:
+  mask_probability: 0.1
+  syllable_dropout: 0.05
+  noise_injection: 0.02
+
+generation:
+  beam_size: 5
+  max_output_length: 64
+  length_penalty: 1.0
+  early_stopping: true
+
+paths:
+  checkpoint_dir: "/kaggle/working/checkpoints"
+  log_dir: "/kaggle/working/logs"
+  experiment_log_path: "/kaggle/working/logs/experiments.json"

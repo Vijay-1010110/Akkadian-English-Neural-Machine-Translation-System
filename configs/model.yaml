@@ -1,0 +1,19 @@
+# Standard model configurations for quick swapping
+
+transformer_base:
+  type: "custom"
+  custom_config:
+    encoder_layers: 6
+    decoder_layers: 6
+    hidden_size: 512
+    attention_heads: 8
+    feedforward_dim: 2048
+    dropout: 0.1
+
+mbart_large:
+  type: "mbart"
+  pretrained_path: "facebook/mbart-large-50"
+  
+mt5_base:
+  type: "mt5"
+  pretrained_path: "google/mt5-base"
