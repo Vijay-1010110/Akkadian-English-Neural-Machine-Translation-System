@@ -25,10 +25,10 @@ data:
 
 training:
   batch_size: 2 # Reduced to 2: mT5-small in FP32 takes exactly 2x memory of FP16
-  learning_rate: 3.0e-5 # Crucial: Decreased for fine-tuning
+  learning_rate: 5.0e-4 # Crucial: mT5 needs much higher LR than typical Transformers (usually 1e-3, 5e-4 is safe)
   weight_decay: 0.01
-  epochs: 10
-  warmup_steps: 1000
+  epochs: 15
+  warmup_steps: 50 # 50 steps is ~1/8 of an epoch with batch size 32
   gradient_accumulation_steps: 16 # Effective batch size of 32
   mixed_precision: false # mT5 is notorious for exploding to NaN in FP16
   clip_norm: 0.5 # Aggressive clipping to prevent loss spikes
